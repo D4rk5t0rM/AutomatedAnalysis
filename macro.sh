@@ -17,10 +17,10 @@ echo
 olevba $1
 
 echo "++++++++++"
-echo "Checking  MSDT CVE-2022-30190 - follina:"
+echo "Checking for possible MSDT CVE-2022-30190 - follina:"
 echo "=========="
 echo
-zipgrep -i '''Target="http''' doc.docx | sed 's/ /\n/g' | grep -i '''Target="h'''
+zipgrep -i '''Target="http''' $1 | sed 's/ /\n/g' | grep -i '''Target="h'''
 
 echo "++++++++++"
 echo "mraptor:"
