@@ -46,7 +46,7 @@ echo "++++++++++"
 echo "Checking for cmd execution:"
 echo "=========="
 echo
-output=$(zipgrep -i '''cmd''' Susdoc.ods| sed 's/</\n/g' | egrep -i 'cmd')
+output=$(zipgrep -i '''cmd''' $1| sed 's/</\n/g' | egrep -i 'cmd')
 echo -e "${red}${output}${reset}"
 echo "-"
 
@@ -54,8 +54,8 @@ echo "++++++++++"
 echo "Checking for Powershell execution:"
 echo "=========="
 echo
-output=$(zipgrep -i '''nop''' Susdoc.ods| sed 's/</\n/g' | egrep -i 'nop')
-output=$(zipgrep -i '''ps''' Susdoc.ods| sed 's/</\n/g' | egrep -i 'ps')
+output=$(zipgrep -i '''nop''' $1| sed 's/</\n/g' | egrep -i 'nop')
+output=$(zipgrep -i '''ps''' $1| sed 's/</\n/g' | egrep -i 'ps')
 echo -e "${red}${output}${reset}"
 echo "-"
 
@@ -63,7 +63,7 @@ echo "++++++++++"
 echo "Checking for dlls:"
 echo "=========="
 echo
-output=$(zipgrep -i '''.dll''' Susdoc.ods| sed 's/</\n/g' | egrep -i '\.dll')
+output=$(zipgrep -i '''.dll''' $1| sed 's/</\n/g' | egrep -i '\.dll')
 echo -e "${red}${output}${reset}"
 echo "-"
 
