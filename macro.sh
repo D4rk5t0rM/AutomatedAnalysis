@@ -12,6 +12,26 @@ bold="\e[1m"
 uline="\e[4m"
 reset="\e[0m"
 
+echo "Hashes:"
+echo "=========="
+echo "MD5:    "
+md5sum $1
+echo "SHA1:   "
+sha1sum $1
+echo "SHA256: "
+sha256sum $1
+echo 
+
+read -p "encrypted? Y/n: " enc
+echo "$enc"
+
+if [ $enc == "y" ]; then
+  echo "password?"
+		read pwd
+		msoffcrypto-tool $1 decrypted.vir -p $pwd
+		echo "run ./macro.sh decrypted.vir"
+		exit 0
+fi
 
 echo "Oleid:"
 echo "=========="
