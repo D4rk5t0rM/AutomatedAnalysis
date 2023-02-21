@@ -32,6 +32,12 @@ echo ""
 echo -e "${red}${bold}--------------------------------${reset}"
 echo ""
 
+echo -e "${green}running pdf-parser: give overview of the file${reset}"
+pdf-parser.py -a -O $1 2>> pdf.error
+echo ""
+echo -e "${red}${bold}--------------------------------${reset}"
+echo ""
+
 
 echo -e "${green}pdf-parser: Search for AcroForm${reset}"
 pdf-parser.py -s AcroForm $1 2>> pdf.error
