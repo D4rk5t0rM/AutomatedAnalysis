@@ -51,6 +51,12 @@ echo
 olevba $1
 
 echo "++++++++++"
+echo "Dumping all OLE Streams:"
+echo "=========="
+echo
+n1=$(oledump.py $1| tail -n1 | cut -d':' -f 1); for i in $(seq 1 $n1); do echo "stream $i:"; oledump.py $1 -s $i; done
+
+echo "++++++++++"
 echo "Checking for possible MSDT CVE-2022-30190 - follina:"
 echo "=========="
 echo
