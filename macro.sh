@@ -24,9 +24,15 @@ echo
 
 read -p "encrypted? Y/n: " enc
 echo "$enc"
-
 if [ $enc == "y" ]; then
-  echo "password?"
+	read -p "Run evilclippy?? Y/n: " clippy
+	echo "$clippy"
+	if [ $clippy == "y" ]; then
+		evilclippy -uu $1
+		echo "run ./macro.sh $1"
+		exit 0
+	else
+	  echo "password?"
 		read pwd
 		msoffcrypto-tool $1 decrypted.vir -p $pwd
 		echo "run ./macro.sh decrypted.vir"
