@@ -24,12 +24,14 @@ echo
 
 read -p "encrypted? Y/n: " enc
 echo "$enc"
-if [ $enc == "y" ]; then
+if [ $enc == "y" or $enc == "Y" or $enc == "" ]; then
 	read -p "Run evilclippy?? Y/n: " clippy
 	echo "$clippy"
-	if [ $clippy == "y" ]; then
+	if [ $clippy == "y" or $clippy == "Y" or $clippy == "" ]; then
 		evilclippy -uu $1
-		echo "run ./macro.sh $1"
+		echo "run ./macro.sh $1[:-3]_EvilClippy.$1[len($1)-3:]"
+		echo "atttempting autorun"
+		./macro.sh $1[:-3]_EvilClippy.$1[len($1)-3:]
 		exit 0
 	else
 	  echo "password?"
