@@ -79,10 +79,16 @@ rtfFile=$(zipdump.py -s $rtfNum -d $1)
 numbers=$(echo $rtfFile | rtfdump.py -O | grep -o '^[0-9]\+')
 URL=$(for i in $numbers; do echo $rtfFile | rtfdump.py -O -s $i -x | tr -d ' ' | tr -d '\n' | xxd -r -p; done | tr -cd '[:print:]' | sed 's/http/\nhttp/g' | grep -o -i '^.*\.xml')
 echo
-echo -e "URL: ${red}${URL}${reset}"
+echo -e "${red}!!! URL: ${URL}${reset}"
 wget $URL 
 echo -e "${green}!!! PLEASE investigate the file manually (useage of Iframes and redirections have been observed in the past look out for these)!!!${reset}"
-echo -e "${red}${output}${reset}"
+numbers=$(echo $rtfFile | rtfdump.py |  grep "b'Word.Document" -B 1 | awk '{ print $1 }' | grep -o '^[0-9]\+')
+URL=$(for i in $numbers; do  echo $rtfFile | rtfdump.py -s $i -x | xxd -r -p | xxd -r -p; done | tr -cd '[:print:]' | sed 's/\\\\/\n\\\\/g' | grep -o "\\\\.*Word.Document.8" | awk -F"Word.Document.8" '{ print $1 }' )
+echo -e "${red}"
+echo -E "!!! URL: ${URL}"
+echo -e "${green}^ Please Download & analyse the file mentioned above manually (this file may be a ofice document, check the filetype!) ^"
+echo -e "${reset}"
+echo
 echo "-"
 
 echo "++++++++++"
