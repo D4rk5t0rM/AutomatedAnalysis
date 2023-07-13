@@ -69,6 +69,23 @@ echo -e "${red}${output}${reset}"
 echo "-"
 
 echo "++++++++++"
+echo "Checking for possible CVE-2023-36884:"
+echo "=========="
+echo
+echo -e "${red}found rtf file: $(zipdump.py $1 | grep -i '\.rtf' | awk '{ print $2, "in stream", $1, "- Ecntryped:" , $3 , "- Timestamp:" , $4, $5 }')${reset}"
+echo
+rtfNum=$(zipdump.py $1 | grep -i '\.rtf' | awk '{ print $1 }')
+rtfFile=$(zipdump.py -s $rtfNum -d $1)
+numbers=$(echo $rtfFile | rtfdump.py -O | grep -o '^[0-9]\+')
+URL=$(for i in $numbers; do echo $rtfFile | rtfdump.py -O -s $i -x | tr -d ' ' | tr -d '\n' | xxd -r -p; done | tr -cd '[:print:]' | sed 's/http/\nhttp/g' | grep -o -i '^.*\.xml')
+echo
+echo -e "URL: ${red}${URL}${reset}"
+wget $URL 
+echo -e "${green}!!! PLEASE investigate the file manually (useage of Iframes and redirections have been observed in the past look out for these)!!!${reset}"
+echo -e "${red}${output}${reset}"
+echo "-"
+
+echo "++++++++++"
 echo "Checking for cmd execution:"
 echo "=========="
 echo
