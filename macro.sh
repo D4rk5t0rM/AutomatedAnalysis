@@ -12,6 +12,8 @@ bold="\e[1m"
 uline="\e[4m"
 reset="\e[0m"
 
+mkdir ./output
+
 echo "Hashes:"
 echo "=========="
 echo "MD5:    "
@@ -70,24 +72,43 @@ echo "-"
 
 echo "++++++++++"
 echo "Checking for possible CVE-2023-36884:"
+# Tests done on the following files with hash SHA256:
+# a61b2eafcf39715031357df6b01e85e0d1ea2e8ee1dfec241b114e18f7a1163f
+# 3464720807187af1e0e603324be2c1864fb4b6eda619bc35bd7c5e2c15ab43ff
 echo "=========="
-echo
+echo 
 echo -e "${red}found rtf file: $(zipdump.py $1 | grep -i '\.rtf' | awk '{ print $2, "in stream", $1, "- Ecntryped:" , $3 , "- Timestamp:" , $4, $5 }')${reset}"
-echo
 rtfNum=$(zipdump.py $1 | grep -i '\.rtf' | awk '{ print $1 }')
+rtfName=$(zipdump.py $1 | grep -i '\.rtf' | awk '{ print $2 }' | sed  's/word\///g')
 rtfFile=$(zipdump.py -s $rtfNum -d $1)
-numbers=$(echo $rtfFile | rtfdump.py -O | grep -o '^[0-9]\+')
-URL=$(for i in $numbers; do echo $rtfFile | rtfdump.py -O -s $i -x | tr -d ' ' | tr -d '\n' | xxd -r -p; done | tr -cd '[:print:]' | sed 's/http/\nhttp/g' | grep -o -i '^.*\.xml')
+echo -e "Dumping RTF file..."
+zipdump.py -s $rtfNum -d $1  > ./output/$rtfName
+echo -e "Analysis of embedded RTF files..."
+rtfobj ./output/$rtfName
+echo -e "dumping all embedded files"
+rtfobj ./output/$rtfName -d ./output -s all
 echo
-echo -e "${red}!!! URL: ${URL}${reset}"
-wget $URL 
-echo -e "${green}!!! PLEASE investigate the file manually (useage of Iframes and redirections have been observed in the past look out for these)!!!${reset}"
-numbers=$(echo $rtfFile | rtfdump.py |  grep "b'Word.Document" -B 1 | awk '{ print $1 }' | grep -o '^[0-9]\+')
-URL=$(for i in $numbers; do  echo $rtfFile | rtfdump.py -s $i -x | xxd -r -p | xxd -r -p; done | tr -cd '[:print:]' | sed 's/\\\\/\n\\\\/g' | grep -o "\\\\.*Word.Document.8" | awk -F"Word.Document.8" '{ print $1 }' )
-echo -e "${red}"
-echo -E "!!! URL: ${URL}"
-echo -e "${green}^ Please Download & analyse the file mentioned above manually (this file may be a ofice document, check the filetype!) ^"
-echo -e "${reset}"
+echo -e "${green}It is possible that this part takes some time. Please be patient! :)${reset}"
+#try catch.
+{
+	numbers=$(echo $rtfFile | rtfdump.py -O | grep -o '^[0-9]\+')
+	URL=$(for i in $numbers; do echo $rtfFile | rtfdump.py -O -s $i -x | tr -d ' ' | tr -d '\n' | xxd -r -p; done | tr -cd '[:print:]' | sed 's/http/\nhttp/g' | grep -o -i '^.*\.xml')
+	echo 
+	echo -e "${red}!!! URL: ${URL}${reset}"
+	cd ./output/
+	wget $URL 
+	cd ..
+	echo -e "${green}!!! PLEASE investigate the file manually (useage of Iframes and redirections have been observed in the past look out for these)!!!${reset}"
+	numbers=$(echo $rtfFile | rtfdump.py |  grep "b'Word.Document" -B 1 | awk '{ print $1 }' | grep -o '^[0-9]\+')
+	URL=$(for i in $numbers; do  echo $rtfFile | rtfdump.py -s $i -x | xxd -r -p | xxd -r -p; done | tr -cd '[:print:]' | sed 's/\\\\/\n\\\\/g' | grep -o "\\\\.*Word.Document.8" | awk -F"Word.Document.8" '{ print $1 }' )
+	echo -e "${red}"
+	echo -E "!!! URL: ${URL}"
+	echo -e "${green}^ Please Download & analyse the file mentioned above manually (this file may be a ofice document, check the filetype!) ^"
+	echo -e "${reset}"
+} || { # catch block
+	echo 
+	echo -e "${green}did not find a URL${reset}"
+}
 echo
 echo "-"
 
@@ -125,4 +146,8 @@ mraptor $1
 echo "++++++++++"
 echo "vmonkey:"
 echo "=========="
-vmonkey $1 > vmonkey.txt
+{
+	vmonkey $1 > ./output/vmonkey.txt
+} || {
+	echo 
+}
